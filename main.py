@@ -1,8 +1,6 @@
 import csv
 import pandas as pd
 
-df = pd.read_csv("movies.csv")#
-# print(df)
 
 #2.1 - Estrutura 1: Armazenando dados sobre filmes (Tabela hash)
 class TabelaHash:
@@ -24,6 +22,13 @@ class TabelaHash:
         for filme in bucket: 
             if filme.movieId == movieId:
                 return filme
+            
+    def attRating(self, movieId, rating):   #calcula a media dos valores das avaliações
+        movie = self.get(movieId)
+        movie.somaRatings += rating 
+        movie.totalRatings += 1
+        movie.mediaRatings = movie.somaRatings / movie.totalRatings
+        return movie.mediaRatings
                    
 class Filme:                                    
     def __init__(self, movieId, movieName, movieGenre, movieYear):
@@ -31,23 +36,33 @@ class Filme:
         self.movieName = movieName
         self.movieGenre = movieGenre
         self.movieYear = movieYear
-
+        self.totalRatings = 0
+        self.mediaRatings = 0
+        self.somaRatings = 0
 
 #para nao aparecer o numero do endereco
     def __str__(self):
-        return f"Filme: {self.movieName}, ID = {self.movieId}, Genero: {self.movieGenre}, Ano: {self.movieYear})"
+        return f"Filme: {self.movieName}, ID = {self.movieId}, Genero: {self.movieGenre}, Ano: {self.movieYear}, Média = {self.mediaRatings})"
 
     def __repr__(self):
-        return f"Filme: {self.movieName}, ID = {self.movieId}, Genero: {self.movieGenre}, Ano: {self.movieYear})"
-    
+        return f"Filme: {self.movieName}, ID = {self.movieId}, Genero: {self.movieGenre}, Ano: {self.movieYear}, Média = {self.mediaRatings})"
+
+
 
 tabelahash = TabelaHash()
 
-
-for index, row in df.iterrows():
+#le os dados e popula - filmes
+df = pd.read_csv("movies.csv")
+for index, row in df.iterrows():            
     tabelahash.add(row ["movieId"], Filme(row ["movieId"], row ["title"], row ["genres"], row ["year"]))
+
+#le os dados e popula - avaliações
+df = pd.read_csv("miniratings.csv")
+for index, row in df.iterrows():
+    tabelahash.attRating(row ["movieId"], row ["rating"])
 
 
 print(tabelahash.buckets)
 print(tabelahash.get(12))
+
 
