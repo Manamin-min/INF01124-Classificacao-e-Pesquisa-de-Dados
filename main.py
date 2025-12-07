@@ -4,12 +4,6 @@ import pandas as pd
 df = pd.read_csv("movies.csv")#
 # print(df)
 
-# for index, row in df.iterrows():
-#     print(index)
-#     print(row)
-#     print(row["userId"], row["movieId"])  # acessar por coluna
-
-
 #2.1 - Estrutura 1: Armazenando dados sobre filmes (Tabela hash)
 class TabelaHash:
     def __init__(self):
@@ -24,32 +18,35 @@ class TabelaHash:
         hash = self.criarHash(movieId)
         self.buckets[hash].append(movie)
             
-    def get(self, movieId):                 #compara o filme do hash com o filme da classe, basicamente pega o filme da tabela e retorna as informacoes especificas
+    def get(self, movieId):                 #passo o id e me retorna o filme com esse id
         hash = self.criarHash(movieId)
         bucket = self.buckets[hash]
         for filme in bucket: 
             if filme.movieId == movieId:
                 return filme
-    
-                
+                   
 class Filme:                                    
-    def __init__(self, movieId, movieName):
+    def __init__(self, movieId, movieName, movieGenre, movieYear):
         self.movieId = movieId
         self.movieName = movieName
+        self.movieGenre = movieGenre
+        self.movieYear = movieYear
+
 
 #para nao aparecer o numero do endereco
     def __str__(self):
-        return f"filme(name={self.movieName}, id={self.movieId})"
+        return f"Filme: {self.movieName}, ID = {self.movieId}, Genero: {self.movieGenre}, Ano: {self.movieYear})"
 
     def __repr__(self):
-        return f"filme(name={self.movieName}, id={self.movieId})"
+        return f"Filme: {self.movieName}, ID = {self.movieId}, Genero: {self.movieGenre}, Ano: {self.movieYear})"
     
+
 tabelahash = TabelaHash()
 
-tabelahash.add(0, Filme(0, "Rei Leao"))
-tabelahash.add(1, Filme(1, "Rei Leao1"))
-tabelahash.add(2, Filme(2, "Rei Leao2"))
-tabelahash.add(12, Filme(12, "Rei Leao12"))
+
+for index, row in df.iterrows():
+    tabelahash.add(row ["movieId"], Filme(row ["movieId"], row ["title"], row ["genres"], row ["year"]))
+
 
 print(tabelahash.buckets)
 print(tabelahash.get(12))
