@@ -1,6 +1,7 @@
 import csv
 import pandas as pd
-
+import math
+import time
 
 #2.1 - Estrutura 1: Armazenando dados sobre filmes (Tabela hash)
 class TabelaHash:
@@ -63,6 +64,121 @@ for index, row in df.iterrows():
 # print(tabelahash.get(12))
 
 #2.2 - Estrutura 2: Estrutura para buscar por strings de nomes (TRIE, Radix Tree, TST)
+class NodoTrieFilmes:
+    def __init__(self):
+        self.filhos = [None] * 256
+        self.idf = None
+        self.fim = False
+class ArvoreTrieFilmes:
+    def __init__(self):
+        self.raiz = NodoTrieFilmes()
+
+def trie_busca_prefixo_aux(raiz, ids):
+    if raiz.fim:
+        ids.append(raiz.idf)
+    for i in range(256):
+        if raiz.filhos[i] is not None:
+            trie_busca_prefixo_aux(raiz.filhos[i], ids)
+    return
+
+def trie_busca_prefixo(raiz, prefix):
+    atual = raiz
+    for letra in prefix:
+        i = ord(letra) % 256
+        if atual.filhos[i] is None:
+            return None
+        atual = atual.filhos[i]
+    ids = []
+    trie_busca_prefixo_aux(atual, ids) 
+    if ids:
+        return ids
+    return None
+
+def busca_por_prefixo(prefix, trie, th):
+    filmes_encontrados = trie_busca_prefixo(trie, prefix)
+    res = []
+    if filmes_encontrados is not None:
+        for filme in filmes_encontrados:
+            if th.get(filme) is not None:
+                res.append(th.get(filme)) # coloca na matriz as informações de cada filme
+        return res
+    return None
+
+def counting_sort(arr, val):
+    n = len(arr)
+    output = [0] * n
+    count = [0] * 10
+    for i in range(n):
+        index = int((arr[i] * (10**6)) // val) % 10
+        count[index] += 1
+    for i in range(1, 10):
+        count[i] += count[i - 1]
+    for i in range(n - 1, -1, -1):
+        index = int((arr[i] * (10**6)) // val) % 10
+        output[count[index] - 1] = arr[i]
+        count[index] -= 1
+    return output
+
+def lsd_radix_sort(arr):
+    max_val = int(max(arr)*(10**6))
+    exp = 1
+    while max_val // exp > 0:
+        arr = counting_sort(arr, exp)
+        exp *= 10
+    return arr
+
+def selection_sort_1(filmes):
+    n = len(filmes)
+    for i in range(n):
+        max = i
+        for j in range(i+1, n):
+            if filmes[j][6] > filmes[max][6]:
+                max = j
+            elif filmes[j][6]==filmes[max][6] and filmes[j][5] > filmes[max][5]:
+                max = j
+        filmes[i], filmes[max] = filmes[max], filmes[i]
+    return filmes
+
+def selection_sort(filmes):
+    n = len(filmes)
+    for i in range(n):
+        max = i
+        for j in range(i+1, n):
+            if filmes[j][5] > filmes[max][5]:
+                max = j
+            elif filmes[j][5]==filmes[max][5] and filmes[j][4]>filmes[max][4]:
+                max = j
+        filmes[i], filmes[max] = filmes[max], filmes[i]
+    return filmes
+
+def le_filmes_csv(nome):
+    df = pd.read_csv(nome, encoding='utf-8')
+    df['genres'] = df['genres'].str.split('|')
+    df = df[['title', 'movieId', 'genres', 'year']]
+    matriz = df.values.tolist()
+    for linha in matriz:
+        linha.extend([0, 0])
+    return matriz
+
+def insere_nodo_trie(raiz, palavra, chave):
+    atual = raiz
+    for letra in palavra:
+        i = ord(letra) % 256
+        if atual.filhos[i] is None:
+            atual.filhos[i] = NodoTrieFilmes()
+        atual = atual.filhos[i]
+    atual.idf = chave
+    atual.fim = True
+
+trie_filmes = ArvoreTrieFilmes()
+
+dados_filmes_movies = le_filmes_csv("movies.csv")
+if dados_filmes_movies:
+    for titulo, id_f, generos, ano, quant_av, media_av in dados_filmes_movies:
+        insere_nodo_trie(trie_filmes.raiz, titulo, id_f)
+
+print(trie_filmes)
+print(busca_por_prefixo("Dra", trie_filmes.raiz, tabelahash))
 
 #2.3 - Estrutura 3: Estrutura para guardar revisões de usuários
 class Reviews:
@@ -167,5 +283,5 @@ df = pd.read_csv("tags.csv")
 for index, row in df.iterrows():
     tabelahashtags.add(row ["movieId"], row ["tag"])
 
-print(tabelahashtags.buckets)
-print(tabelahashtags.get(12))
+# print(tabelahashtags.buckets)
+# print(tabelahashtags.get(12))
