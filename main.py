@@ -177,8 +177,8 @@ if dados_filmes_movies:
     for titulo, id_f, generos, ano, quant_av, media_av in dados_filmes_movies:
         insere_nodo_trie(trie_filmes.raiz, titulo, id_f)
 
-print(trie_filmes)
-print(busca_por_prefixo("Dra", trie_filmes.raiz, tabelahash))
+# print(trie_filmes)
+# print(busca_por_prefixo("Dra", trie_filmes.raiz, tabelahash))
 
 #2.3 - Estrutura 3: Estrutura para guardar revisões de usuários
 class Reviews:
@@ -279,9 +279,35 @@ class TabelaHashTags:
             
 tabelahashtags = TabelaHashTags()
 
-df = pd.read_csv("tags.csv")
-for index, row in df.iterrows():
-    tabelahashtags.add(row ["movieId"], row ["tag"])
+# df = pd.read_csv("tags.csv")
+# for index, row in df.iterrows():
+#     tabelahashtags.add(row ["movieId"], row ["tag"])
 
 # print(tabelahashtags.buckets)
 # print(tabelahashtags.get(12))
+
+##################################################################################################################################################################
+# Pesquisa
+# 3.1 Pesquisa 1: prefixo de nomes de filmes
+
+while True:
+    print("Digite um prefixo para buscar filmes:  ")
+    var = input()
+    prefixo = busca_por_prefixo(var, trie_filmes.raiz, tabelahash)
+
+    if prefixo == None:
+        print("Nenhum filme encontrado")
+        continue
+
+    print("|  Movie ID  |   Year   |     Ratings     |   Count     |                                       Genre                                          |             Title               |")
+
+    for var1 in prefixo:
+        print(f"{var1.movieId}\t\t{var1.movieYear}\t\t{var1.mediaRatings}\t\t{var1.totalRatings}\t\t{var1.movieGenre}\t\t\t\t\t\t\t\t\t{var1.movieName}")
+
+# 3.2 Pesquisa 2: filmes revisados por usuarios
+
+
+
+# 3.3 Pesquisa 3: melhores filmes de uma determinado genero
+
+# 3.4 Pesquisa 4: tags atribu´ıdas por usuarios para filmes 
