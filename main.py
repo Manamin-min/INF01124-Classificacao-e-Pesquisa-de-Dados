@@ -12,7 +12,7 @@ class TabelaHash:
     def criarHash(self, movieId):           #achar o indice da tabela
         return movieId % 10
 
-    def add(self, movieId, movie):          #adiciona o FILME (interiro) na hash
+    def add(self, movieId, movie):          #adiciona o FILME (inteiro) na hash
         hash = self.criarHash(movieId)
         self.buckets[hash].append(movie)
             
@@ -119,10 +119,53 @@ tabelahashreviews = TabelaHashReviews()
 df = pd.read_csv("miniratings.csv")
 for index, row in df.iterrows():
     tabelahashreviews.add(row ["userId"], Reviews(row ["movieId"], row ["rating"], row ["date"]))
-
-
                    
-print(tabelahashreviews.buckets)
-print(tabelahashreviews.get(1))
-#2.4 - Estrutura 4: Estrutura para guardar tags
+# print(tabelahashreviews.buckets)
+# print(tabelahashreviews.get(1))
 
+#2.4 - Estrutura 4: Estrutura para guardar tags
+class Tags:
+    def __init__(self, tag):
+        self.tag = tag
+        self.movieIds = []
+
+    def __str__(self):
+        return f"Tag: {self.tag}, MovieIds: {self.movieIds})"
+
+    def __repr__(self):
+        return f"Tag: {self.tag}, MovieIds: {self.movieIds})"
+
+class TabelaHashTags:
+    def __init__(self):
+        self.buckets = []
+        for i in range(10):                 #itera de 0 a 9
+            self.buckets.append([])
+
+    def criarHash(self, tag):
+        return sum(ord(c) for c in str(tag))%10
+    
+    def add(self, movieId, tag):          #cria a hash pela tag, adiciona o filme e a tag
+        hash = self.criarHash(tag)
+        bucket = self.buckets[hash]
+        filmesPorTag = self.get(tag)           #pega a coleção de filmes por tag
+        if filmesPorTag == None:
+            filmesPorTag = Tags(tag)
+            bucket.append(filmesPorTag)
+        filmesPorTag.movieIds.append(movieId)
+            
+    def get(self, tag):                 #passo o tag e me retorna o filme com esse id
+        hash = self.criarHash(tag)
+        bucket = self.buckets[hash]
+        for filmePorTag in bucket: 
+            if filmePorTag.tag == tag:
+                return filmePorTag
+        return None
+            
+tabelahashtags = TabelaHashTags()
+
+df = pd.read_csv("tags.csv")
+for index, row in df.iterrows():
+    tabelahashtags.add(row ["movieId"], row ["tag"])
+
+print(tabelahashtags.buckets)
+print(tabelahashtags.get(12))
