@@ -287,27 +287,37 @@ tabelahashtags = TabelaHashTags()
 # print(tabelahashtags.get(12))
 
 ##################################################################################################################################################################
-# Pesquisa
+# Pesquisas
 # 3.1 Pesquisa 1: prefixo de nomes de filmes
 
-while True:
-    print("Digite um prefixo para buscar filmes:  ")
-    var = input()
-    prefixo = busca_por_prefixo(var, trie_filmes.raiz, tabelahash)
+# while True:
+#     print("Digite um prefixo para buscar filmes:  ")
+#     var = input()
+#     prefixo = busca_por_prefixo(var, trie_filmes.raiz, tabelahash)
 
-    if prefixo == None:
-        print("Nenhum filme encontrado")
-        continue
+#     if prefixo == None:
+#         print("Nenhum filme encontrado")
+#         continue
 
-    print("|  Movie ID  |   Year   |     Ratings     |   Count     |                                       Genre                                          |             Title               |")
+#     print("|  Movie ID  |   Year   |     Ratings     |   Count     |                                       Genre                                          |             Title               |")
 
-    for var1 in prefixo:
-        print(f"{var1.movieId}\t\t{var1.movieYear}\t\t{var1.mediaRatings}\t\t{var1.totalRatings}\t\t{var1.movieGenre}\t\t\t\t\t\t\t\t\t{var1.movieName}")
+#     for var1 in prefixo:
+#         print(f"{var1.movieId}\t\t{var1.movieYear}\t\t{var1.mediaRatings: .2f}\t\t{var1.totalRatings}\t\t{var1.movieGenre:<40}\t\t{var1.movieName}")
 
 # 3.2 Pesquisa 2: filmes revisados por usuarios
 
+while True:
+    print("Digite um UserID para verificar quais filmes ele fez review: ")
+    userID = int(input())
+    userReviews = tabelahashreviews.get(userID) 
+   
+    
 
+    for review in userReviews.reviews:
+        filme = tabelahash.get(review.movieId)
+        print(f"{review.movieId}\t{review.rating}\t{review.date}\t{filme.movieYear}\t\t{filme.mediaRatings: .2f}\t\t{filme.totalRatings}\t\t{filme.movieGenre:<40}\t\t{filme.movieName}")
 
+    
 # 3.3 Pesquisa 3: melhores filmes de uma determinado genero
 
 # 3.4 Pesquisa 4: tags atribu´ıdas por usuarios para filmes 
